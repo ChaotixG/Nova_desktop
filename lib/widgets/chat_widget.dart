@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'custom_button.dart' as button; // Import your custom button
+import '../color_reference.dart';
 import 'dart:async';
+import '../states/voice_state.dart'; // Import the VoiceStateWidget
 
 class ChatWidget extends StatefulWidget {
   const ChatWidget({super.key});
@@ -20,35 +23,43 @@ class ChatWidgetState extends State<ChatWidget> {
     _addAIMessage("Hello! I'm Nova. How can I assist you?");
   }
 
+  /// Adds an AI message to the chat with a typing effect.
   Future<void> _addAIMessage(String fullMessage) async {
+    if (!mounted) return; // Check if the widget is still mounted
+
     setState(() {
-      _isTyping = true;
-      messages.add(Message(text: "", isSender: false));
+      _isTyping = false;
+      messages.add(Message(text: "", isSender: false)); // Adds blank message initially
     });
 
-    int index = messages.length - 1;
     String currentMessage = "";
     for (int i = 0; i < fullMessage.length; i++) {
-      await Future.delayed(Duration(milliseconds: 40));
+      await Future.delayed(const Duration(milliseconds: 40));
+
+      currentMessage += fullMessage[i];
+      if (!mounted) return; // Check if the widget is still mounted
+
       setState(() {
-        currentMessage += fullMessage[i];
-        messages[index] = Message(text: currentMessage, isSender: false);
+        messages[messages.length - 1] = Message(text: currentMessage, isSender: false); // Updates the message one character at a time
       });
     }
-    setState(() => _isTyping = false);
   }
 
+  /// Handles sending a user message.
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isNotEmpty) {
       setState(() {
-        messages.add(Message(text: text, isSender: true));
+        messages.add(Message(text: text, isSender: true)); // User message
+        _isTyping = false; // Hide typing indicator when user sends a message
       });
       _controller.clear();
-      Future.delayed(Duration(seconds: 1), () => _addAIMessage("I received: \"$text\""));
+      _isTyping = true;
+      Future.delayed(const Duration(seconds: 4), () => _addAIMessage("I received: \"$text\""));
     }
   }
 
+  /// Displays options to copy or delete a message when it's long-pressed.
   void _onMessageLongPress(BuildContext context, Message message) {
     showModalBottomSheet(
       context: context,
@@ -83,57 +94,66 @@ class ChatWidgetState extends State<ChatWidget> {
     return Scaffold(
       body: Column(
         children: [
-          Expanded(
-            child: ListView.builder(
-              reverse: true,
-              itemCount: messages.length + (_isTyping ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (_isTyping && index == 0) {
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.all(10),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text("Nova is typing...", style: TextStyle(color: Colors.grey)),
-                    ),
-                  );
-                }
-
-                final reversedIndex = _isTyping ? index - 1 : index;
-                final message = messages[messages.length - 1 - reversedIndex];
-                return GestureDetector(
-                  onLongPress: () => _onMessageLongPress(context, message),
-                  child: Align(
-                    alignment: message.isSender ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.all(10),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: message.isSender
-                            ? Colors.blueAccent.withAlpha(51)
-                            : Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        message.text,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          _buildMessageList(),
           _buildInputField(),
         ],
       ),
     );
   }
 
+  /// Builds the chat message list.
+  Widget _buildMessageList() {
+    return Expanded(
+      child: ListView.builder(
+        reverse: true,
+        itemCount: messages.length + (_isTyping ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (_isTyping && index == 0) {
+            return _buildTypingIndicator(); // Displays typing indicator for AI
+          }
+
+          final message = messages[messages.length - 1 - (_isTyping ? index - 1 : index)];
+          return GestureDetector(
+            onLongPress: () => _onMessageLongPress(context, message),
+            child: Align(
+              alignment: message.isSender ? Alignment.centerRight : Alignment.centerLeft,
+              child: _buildMessageBubble(message),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Builds a message bubble (sent or received message).
+  Widget _buildMessageBubble(Message message) {
+    return Container(
+      margin: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: message.isSender
+            ? Colors.blueAccent.withAlpha(51)
+            : Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        message.text,
+        style: const TextStyle(fontSize: 16),
+      ),
+    );
+  }
+
+  /// Builds the typing indicator.
+  Widget _buildTypingIndicator() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: _buildMessageBubble(
+        Message(text: "Nova is typing...", isSender: false),
+      ),
+    );
+  }
+
+  /// Builds the message input field and custom button with microphone icon.
   Widget _buildInputField() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -142,20 +162,31 @@ class ChatWidgetState extends State<ChatWidget> {
           Expanded(
             child: TextField(
               controller: _controller,
-              onSubmitted: (_) => _sendMessage(), // Sends message on Enter key press
+              onSubmitted: (_) => _sendMessage(),
               decoration: InputDecoration(
                 hintText: "Type a message...",
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               ),
-              minLines: 1, // Starts with one row
-              maxLines: 4, // Expands up to four rows for long messages
+              minLines: 1,
+              maxLines: 4,
             ),
           ),
           const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.send, color: Colors.blueAccent),
-            onPressed: _sendMessage,
+          // Use the CustomButton with microphone icon inside
+          button.CustomButton(
+            text: "", // Keep the text empty
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const VoiceStateWidget()),
+              );
+            },
+            icon: Icon(
+              Icons.mic, // Microphone icon
+              color: AppColors.primaryColor, // Icon color
+              size: 30, // Icon size
+            ),
           ),
         ],
       ),
@@ -163,6 +194,7 @@ class ChatWidgetState extends State<ChatWidget> {
   }
 }
 
+/// Represents a message in the chat.
 class Message {
   final String text;
   final bool isSender;

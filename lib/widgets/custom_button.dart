@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
-  final String text;
+  final String? text; // text is now optional (can be null)
   final VoidCallback onPressed;
+  final Widget? icon; // Optional icon parameter
 
   const CustomButton({
-    super.key, // Add the Key parameter
-    required this.text,
+    super.key,
+    this.text, // Text is optional now
     required this.onPressed,
-  }); // Pass the key to the superclass
+    this.icon, // Icon is also optional
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,17 @@ class CustomButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.0),
         ),
       ),
-      child: Text(text, style: const TextStyle(fontSize: 18)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            icon!,
+            if (text != null) const SizedBox(width: 8), // Add space between icon and text if both are present
+          ],
+          if (text != null) 
+            Text(text!, style: const TextStyle(fontSize: 18)), // Display text only if provided
+        ],
+      ),
     );
   }
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'states/home_screen_state.dart'; // Home state
-//import 'states/calendar_state.dart'; // Calendar state
-//import 'states/nova_state.dart'; // Nova UI state
 import 'app_state.dart'; // Abstract AppState base class
+import 'color_reference.dart';
+import 'states/settings_state.dart';
+import 'states/home_screen_state.dart'; // Home state
 import 'widgets/drawer_widget.dart'; // Updated AppDrawer widget
 
 void main() {
@@ -17,7 +17,7 @@ class NovaApp extends StatefulWidget {
 }
 
 class NovaAppState extends State<NovaApp> {
-  late AppState _currentState;
+  late AppState _currentState = HomeScreenState(onStateChange: _changeState);
 
   /// Method to change the active state dynamically.
   void _changeState(AppState newState) {
@@ -26,43 +26,39 @@ class NovaAppState extends State<NovaApp> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    // Initialize the home screen as the default state
-    _currentState = HomeScreenState(onStateChange: _changeState);
+  Drawer? _getDrawer() {
+    // Hide the drawer when the current state is HomeScreenState or SettingsState
+    return (_currentState is HomeScreenState || _currentState is SettingsState)
+        ? null
+        : AppDrawer(onStateChange: _changeState); // Return the drawer if it's not either of the two states
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Project Nova',
+      title: 'Nova',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: AppColors.primarySwatch)
+            .copyWith(secondary: AppColors.secondarySwatch),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Project Nova'),
+          title: const Text('Nova'),
           centerTitle: true,
         ),
-        drawer: AppDrawer(onStateChange: _changeState), // Updated Drawer
+        drawer: _getDrawer(),
         body: AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           switchInCurve: Curves.easeIn,
           switchOutCurve: Curves.easeOut,
-          layoutBuilder: (currentChild, previousChildren) {
-            return Stack(
-              children: [
-                if (currentChild != null) currentChild,
-                ...previousChildren,
-              ],
-            );
-          },
-          child: KeyedSubtree(
-            key: ValueKey(_currentState.runtimeType), // Ensures correct state rendering
-            child: _currentState,
+          layoutBuilder: (currentChild, previousChildren) => Stack(
+            children: [
+              if (currentChild != null) currentChild!,
+              ...previousChildren,
+            ],
           ),
+          child: _currentState,
         ),
       ),
     );

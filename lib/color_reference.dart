@@ -1,9 +1,45 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary and Secondary Colors
-  static const Color primaryColor = Color(0xFF6200EA); // Deep Purple (Primary)
-  static const Color secondaryColor = Color(0xFF03DAC5); // Teal (Secondary)
+  // Primary Colors 
+  static const int _primaryValue = 0xFFB370FF;
+
+  static const MaterialColor primarySwatch = MaterialColor(
+    _primaryValue,
+    <int, Color>{
+      50: Color(0xFFF3E5FF), // Very light purple
+      100: Color(0xFFE1BFFF), // Lighter purple
+      200: Color(0xFFCD94FF), // Light purple
+      300: Color(0xFFB370FF), // Your base color
+      400: Color(0xFFA05EFF), // Slightly darker
+      500: Color(_primaryValue), // Base color (primary)
+      600: Color(0xFF9B53E6), // Darker
+      700: Color(0xFF843CC4), // Even darker
+      800: Color(0xFF6E27A3), // Dark purple
+      900: Color(0xFF571182), // Deep dark purple
+    },
+  );
+
+  //Secondairy Colors
+  static const int _secondaryValue = 0xFF4510DE;
+
+  static const MaterialColor secondarySwatch = MaterialColor(
+    _secondaryValue,
+    <int, Color>{
+      50: Color(0xFFEDE6FB), // Very light violet
+      100: Color(0xFFD1BEF5), // Lighter violet
+      200: Color(0xFFB28DEF), // Light violet
+      300: Color(0xFF935CEC), // Base tint
+      400: Color(0xFF7A36E8), // Slightly darker tint
+      500: Color(_secondaryValue), // Base color (primary shade)
+      600: Color(0xFF3F0DCA), // Darker
+      700: Color(0xFF370BAE), // Even darker
+      800: Color(0xFF2F0893), // Dark violet
+      900: Color(0xFF220666), // Deep dark violet
+    },
+  );
+  static const Color primaryColor = Color(0xFFB370FF);
+  static const Color secondaryColor = Color(0xFF4510DE); // purple (Secondary)
   
   // Background Colors
   static const Color backgroundColor = Color(0xFFF5F5F5); // Light Gray
