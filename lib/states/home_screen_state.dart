@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../app_state.dart'; // Import the abstract base class
-import 'nova_state.dart'; // Ensure NovaUI is correctly imported
+import '../app_state.dart';
+import '../states/nova_state.dart';
+import '../widgets/custom_button.dart'; // Import CustomButton widget
 
-/// Concrete State: Home Screen State
 class HomeScreenState extends AppState {
   final Function(AppState) onStateChange;
 
@@ -23,17 +23,12 @@ class HomeScreenState extends AppState {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
+            CustomButton(
+              text: 'What can I do for you?',
               onPressed: () {
-                // Pass `onStateChange` to NovaUIState when navigating
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NovaUIState(onStateChange: onStateChange),
-                  ),
-                );
+                // Pass `onStateChange` for state management
+                onStateChange(NovaUIState(onStateChange: onStateChange));
               },
-              child: const Text('What can I do for you?'),
             ),
           ],
         ),
