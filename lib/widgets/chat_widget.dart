@@ -39,7 +39,7 @@ class ChatWidgetState extends State<ChatWidget> {
   }
 
   void _sendMessage() {
-    final text = _controller.text;
+    final text = _controller.text.trim();
     if (text.isNotEmpty) {
       setState(() {
         messages.add(Message(text: text, isSender: true));
@@ -55,19 +55,19 @@ class ChatWidgetState extends State<ChatWidget> {
       builder: (_) => Wrap(
         children: [
           ListTile(
-            leading: Icon(Icons.copy),
-            title: Text("Copy"),
+            leading: const Icon(Icons.copy),
+            title: const Text("Copy"),
             onTap: () {
               Navigator.pop(context);
               Clipboard.setData(ClipboardData(text: message.text));
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Message copied to clipboard.")),
+                const SnackBar(content: Text("Message copied to clipboard.")),
               );
             },
           ),
           ListTile(
-            leading: Icon(Icons.delete),
-            title: Text("Delete"),
+            leading: const Icon(Icons.delete),
+            title: const Text("Delete"),
             onTap: () {
               setState(() => messages.remove(message));
               Navigator.pop(context);
@@ -81,7 +81,6 @@ class ChatWidgetState extends State<ChatWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Nova"), automaticallyImplyLeading: false),
       body: Column(
         children: [
           Expanded(
@@ -93,13 +92,13 @@ class ChatWidgetState extends State<ChatWidget> {
                   return Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(12),
+                      margin: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text("Nova is typing...", style: TextStyle(color: Colors.grey)),
+                      child: const Text("Nova is typing...", style: TextStyle(color: Colors.grey)),
                     ),
                   );
                 }
@@ -111,17 +110,17 @@ class ChatWidgetState extends State<ChatWidget> {
                   child: Align(
                     alignment: message.isSender ? Alignment.centerRight : Alignment.centerLeft,
                     child: Container(
-                      margin: EdgeInsets.all(10),
-                      padding: EdgeInsets.all(12),
+                      margin: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: message.isSender
-                            ? Colors.blueAccent.withAlpha(51) // 20% opacity
+                            ? Colors.blueAccent.withAlpha(51)
                             : Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(
                         message.text,
-                        style: TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ),
                   ),
@@ -143,16 +142,19 @@ class ChatWidgetState extends State<ChatWidget> {
           Expanded(
             child: TextField(
               controller: _controller,
+              onSubmitted: (_) => _sendMessage(), // Sends message on Enter key press
               decoration: InputDecoration(
                 hintText: "Type a message...",
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-                contentPadding: EdgeInsets.symmetric(horizontal: 20),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20),
               ),
+              minLines: 1, // Starts with one row
+              maxLines: 4, // Expands up to four rows for long messages
             ),
           ),
-          SizedBox(width: 8),
+          const SizedBox(width: 8),
           IconButton(
-            icon: Icon(Icons.send, color: Colors.blueAccent),
+            icon: const Icon(Icons.send, color: Colors.blueAccent),
             onPressed: _sendMessage,
           ),
         ],

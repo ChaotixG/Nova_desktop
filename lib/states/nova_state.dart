@@ -11,10 +11,6 @@ class NovaUIState extends AppState {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nova UI'),
-        backgroundColor: Colors.blue,
-      ),
       drawer: AppDrawer(onStateChange: onStateChange),
       body: Column(
         children: [
