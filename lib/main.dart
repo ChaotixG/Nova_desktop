@@ -54,7 +54,7 @@ class NovaAppState extends State<NovaApp> {
           switchOutCurve: Curves.easeOut,
           layoutBuilder: (currentChild, previousChildren) => Stack(
             children: [
-              if (currentChild != null) currentChild!,
+              if (currentChild != null) currentChild,
               ...previousChildren,
             ],
           ),

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lottie/lottie.dart';
 import 'custom_button.dart' as button; // Import your custom button
-import '../color_reference.dart';
+//import '../color_reference.dart';
 import 'dart:async';
 import '../states/voice_state.dart'; // Import the VoiceStateWidget
 
@@ -173,19 +174,24 @@ class ChatWidgetState extends State<ChatWidget> {
             ),
           ),
           const SizedBox(width: 8),
-          // Use the CustomButton with microphone icon inside
+          // Use the CustomButton with microphone icon or animation
           button.CustomButton(
             text: "", // Keep the text empty
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const VoiceStateWidget()),
+                MaterialPageRoute(
+                  builder: (context) => VoiceStateWidget(
+                    onBackToNova: () {
+                      Navigator.pop(context); // Go back to the previous screen
+                    },
+                  ),
+                ),
               );
             },
-            icon: Icon(
-              Icons.mic, // Microphone icon
-              color: AppColors.primaryColor, // Icon color
-              size: 30, // Icon size
+            animationOrGif: Lottie.asset(
+              'assets/animations/ai_speech.json',
+              width: MediaQuery.of(context).size.width * 0.05, // 5% of the screen width
             ),
           ),
         ],

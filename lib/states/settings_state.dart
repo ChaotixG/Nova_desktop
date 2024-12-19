@@ -5,7 +5,7 @@ import '../app_state.dart'; // Importing the base class
 class SettingsState extends AppState {
   final Function(AppState) onStateChange;
 
-  SettingsState({required this.onStateChange});
+  const SettingsState({super.key, required this.onStateChange});
 
   @override
   Widget build(BuildContext context) {

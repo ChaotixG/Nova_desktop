@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
-  final String? text; // text is now optional (can be null)
+  final String? text; // Optional text
   final VoidCallback onPressed;
-  final Widget? icon; // Optional icon parameter
+  final Widget? icon; // Optional icon
+  final Widget? animationOrGif; // Optional animation or GIF
+  final OutlinedBorder? shape; // Corrected type to match ElevatedButton's requirement
 
   const CustomButton({
     super.key,
-    this.text, // Text is optional now
+    this.text,
     required this.onPressed,
-    this.icon, // Icon is also optional
+    this.icon,
+    this.animationOrGif,
+    this.shape, // Custom shape
   });
 
   @override
@@ -18,19 +22,26 @@ class CustomButton extends StatelessWidget {
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-        shape: RoundedRectangleBorder(
+        shape: shape ?? RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (animationOrGif != null) ...[
+            animationOrGif!,
+            if (text != null || icon != null) const SizedBox(width: 8),
+          ],
           if (icon != null) ...[
             icon!,
-            if (text != null) const SizedBox(width: 8), // Add space between icon and text if both are present
+            if (text != null) const SizedBox(width: 8),
           ],
-          if (text != null) 
-            Text(text!, style: const TextStyle(fontSize: 18)), // Display text only if provided
+          if (text != null)
+            Text(
+              text!,
+              style: const TextStyle(fontSize: 18),
+            ),
         ],
       ),
     );
